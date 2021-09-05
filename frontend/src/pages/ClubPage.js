@@ -1,11 +1,11 @@
-import "./App.scss";
-import "./gh-fork-ribbon.css";
+import "./ClubPage.scss";
+import "../gh-fork-ribbon.css";
 import React from "react";
 import BN from "bn.js";
 import * as nearAPI from "near-api-js";
 import { AlphaPicker, HuePicker, GithubPicker } from "react-color";
 import Switch from "react-switch";
-import { Weapons } from "./Weapons";
+import { Weapons } from "../Weapons";
 import Timer from "react-compound-timer";
 
 const PixelPrice = new BN("10000000000000000000000");
