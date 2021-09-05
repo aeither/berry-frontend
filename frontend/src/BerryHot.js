@@ -3,9 +3,8 @@ import "error-polyfill";
 import "bootstrap/dist/js/bootstrap.bundle";
 import "bootstrap/dist/css/bootstrap.min.css";
 // import "./App.scss";
-import "./gh-fork-ribbon.css";
 import * as nearAPI from "near-api-js";
-import Logo from "./images/logo.png";
+import Logo from "./images/berrylogo.png";
 import DiscoverPage from "./pages/Discover";
 import HomePage from "./pages/Home";
 import { HashRouter as Router, Link, Route, Switch } from "react-router-dom";
@@ -16,6 +15,7 @@ import AccountPage from "./pages/Account";
 import StatsPage from "./pages/Stats";
 import RecentPage from "./pages/Recent";
 import ClubPage from "./pages/ClubPage";
+import FarmPage from "./pages/FarmPage";
 
 const IsMainnet = window.location.hostname === "berry.cards";
 const TestNearConfig = {
@@ -165,7 +165,7 @@ class App extends React.Component {
 
   async requestSignIn(e) {
     e && e.preventDefault();
-    const appTitle = "Berry Cards";
+    const appTitle = "Berry";
     await this._near.walletConnection.requestSignIn(
       NearConfig.contractName,
       appTitle
@@ -275,7 +275,7 @@ class App extends React.Component {
                   alt="Berry Cards"
                   className="d-inline-block align-middle"
                 />
-                Berry Cards
+                Berry
               </Link>
               <button
                 className="navbar-toggler"
@@ -294,15 +294,26 @@ class App extends React.Component {
               >
                 <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                   <li className="nav-item">
-                    <Link className="nav-link" aria-current="page" to="/home">
-                      Home
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link className="nav-link" aria-current="page" to="/club">
+                    <Link className="nav-link" aria-current="page" to="/">
                       Club
                     </Link>
                   </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" aria-current="page" to="/farm">
+                      Farm
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" aria-current="page" to="/cards">
+                      Cards
+                    </Link>
+                  </li>
+                  <a
+                    className="btn btn-outline-none"
+                    href="https://app.ref.finance/#wrap.near|farm.berryclub.ek.near"
+                  >
+                    REF Finance
+                  </a>
                   <li className="nav-item">
                     <Link className="nav-link" aria-current="page" to="/recent">
                       Recent
@@ -337,25 +348,19 @@ class App extends React.Component {
             </div>
           </nav>
 
-          <a
-            className="github-fork-ribbon right-bottom fixed"
-            href="https://github.com/evgenykuzyakov/berry-hot"
-            data-ribbon="Fork me on GitHub"
-            title="Fork me on GitHub"
-          >
-            Fork me on GitHub
-          </a>
-
           <Switch>
-            <Route exact path={"/home"}>
+            <Route exact path={"/"}>
+              <ClubPage {...passProps} />
+            </Route>
+            <Route exact path={"/farm"}>
+              <FarmPage {...passProps} />
+            </Route>
+            <Route exact path={"/cards"}>
               {this.state.signedIn ? (
                 <HomePage {...passProps} />
               ) : (
                 <DiscoverPage {...passProps} />
               )}
-            </Route>
-            <Route exact path={"/club"}>
-              <ClubPage {...passProps} />
             </Route>
             <Route exact path={"/recent"}>
               <RecentPage {...passProps} />

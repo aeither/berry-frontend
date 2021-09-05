@@ -1,4 +1,4 @@
-import "./Home.scss";
+// import "./Home.scss";
 import React, {useState} from 'react';
 import { CardImage, preloadCard } from "../components/CardImage";
 import CardPreview from "../components/CardPreview";

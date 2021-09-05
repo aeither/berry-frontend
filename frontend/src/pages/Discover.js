@@ -1,4 +1,3 @@
-import "./Discover.scss";
 import React, { useEffect, useState} from 'react';
 import uuid from "react-uuid";
 import CardPreview from "../components/CardPreview";

@@ -1,11 +1,10 @@
 import "./ClubPage.scss";
-import "../gh-fork-ribbon.css";
 import React from "react";
 import BN from "bn.js";
 import * as nearAPI from "near-api-js";
 import { AlphaPicker, HuePicker, GithubPicker } from "react-color";
 import Switch from "react-switch";
-import { Weapons } from "../Weapons";
+import { Weapons } from "../components/Weapons";
 import Timer from "react-compound-timer";
 
 const PixelPrice = new BN("10000000000000000000000");
@@ -661,7 +660,8 @@ class App extends React.Component {
       }
     );
     this._pixelCost = parseFloat(await this._contract.get_pixel_cost());
-    const freeDrawingTimestamp = await this._contract.get_free_drawing_timestamp();
+    const freeDrawingTimestamp =
+      await this._contract.get_free_drawing_timestamp();
     this._freeDrawingStart = new Date(freeDrawingTimestamp);
     this._freeDrawingEnd = new Date(freeDrawingTimestamp + OneDayMs);
     if (this._accountId) {
@@ -1306,51 +1306,7 @@ class App extends React.Component {
             ""
           )}
         </div>
-        {/*<div className={`padded${watchClass}`}>*/}
-        {/*  <div className="video-container">*/}
-        {/*    <iframe*/}
-        {/*      title="youtube3"*/}
-        {/*      className="youtube"*/}
-        {/*      src="https://www.youtube.com/embed/wfTa-Kgw2DM"*/}
-        {/*      frameBorder="0"*/}
-        {/*      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"*/}
-        {/*      allowFullScreen*/}
-        {/*    />*/}
-        {/*  </div>*/}
-        {/*</div>*/}
-        {/*<div className={`padded${watchClass}`}>*/}
-        {/*  <div className="video-container">*/}
-        {/*    <iframe*/}
-        {/*      title="youtube2"*/}
-        {/*      className="youtube"*/}
-        {/*      src="https://www.youtube.com/embed/PYF6RWd7ZgI"*/}
-        {/*      frameBorder="0"*/}
-        {/*      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"*/}
-        {/*      allowFullScreen*/}
-        {/*    />*/}
-        {/*  </div>*/}
-        {/*</div>*/}
-        {/*<div className={`padded${watchClass}`}>*/}
-        {/*  <div className="video-container">*/}
-        {/*    <iframe*/}
-        {/*      title="youtube"*/}
-        {/*      className="youtube"*/}
-        {/*      src="https://www.youtube.com/embed/lMSWhCwstLo"*/}
-        {/*      frameBorder="0"*/}
-        {/*      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"*/}
-        {/*      allowFullScreen*/}
-        {/*    />*/}
-        {/*  </div>*/}
-        {/*</div>*/}
         {weapons}
-        <a
-          className={`github-fork-ribbon right-bottom fixed${watchClass}`}
-          href="https://github.com/evgenykuzyakov/berryclub"
-          data-ribbon="Fork me on GitHub"
-          title="Fork me on GitHub"
-        >
-          Fork me on GitHub
-        </a>
       </div>
     );
   }
