@@ -4,18 +4,16 @@ import "bootstrap/dist/js/bootstrap.bundle";
 import "bootstrap/dist/css/bootstrap.min.css";
 // import "./App.scss";
 import * as nearAPI from "near-api-js";
-import Logo from "./images/berrylogo.png";
-import DiscoverPage from "./pages/Discover";
-import HomePage from "./pages/Home";
+import DiscoverPage from "./Discover";
+import HomePage from "./Home";
 import { HashRouter as Router, Link, Route, Switch } from "react-router-dom";
-import { fromNear } from "./components/BuyButton";
+import { fromNear } from "../components/BuyButton";
 import ls from "local-storage";
-import CardPage from "./pages/Card";
-import AccountPage from "./pages/Account";
-import StatsPage from "./pages/Stats";
-import RecentPage from "./pages/Recent";
-import ClubPage from "./pages/ClubPage";
-import FarmPage from "./pages/FarmPage";
+import CardPage from "./Card";
+import AccountPage from "./Account";
+import StatsPage from "./Stats";
+import RecentPage from "./Recent";
+import { Button, HStack, Box } from "@chakra-ui/react";
 
 const IsMainnet = window.location.hostname === "berry.cards";
 const TestNearConfig = {
@@ -49,7 +47,7 @@ const mapAccount = (a) => {
   };
 };
 
-class App extends React.Component {
+class CardsPage extends React.Component {
   constructor(props) {
     super(props);
 
@@ -245,117 +243,60 @@ class App extends React.Component {
         ></span>
       </div>
     ) : this.state.signedIn ? (
-      <div>
-        <button
-          className="btn btn-outline-secondary"
-          onClick={() => this.logOut()}
-        >
-          Sign out ({this.state.signedAccountId})
-        </button>
-      </div>
+      <Button
+        variant="outline"
+        rounded="xl"
+        border="2px"
+        borderColor="brand.900"
+        color="brand.900"
+        _hover={{ filter: "brightness(0.5)" }}
+        onClick={() => this.logOut()}
+      >
+        Log out ({this.state.signedAccountId})
+      </Button>
     ) : (
-      <div>
-        <button
-          className="btn btn-primary"
-          onClick={(e) => this.requestSignIn(e)}
-        >
-          Sign in with NEAR Wallet
-        </button>
-      </div>
+      <Button
+        variant="solid"
+        rounded="xl"
+        background="brand.900"
+        _hover={{ filter: "brightness(0.8)" }}
+        onClick={() => this.requestSignIn()}
+      >
+        Log in with NEAR Wallet
+      </Button>
     );
 
     return (
       <div className="App">
         <Router basename={process.env.PUBLIC_URL}>
-          <nav className="navbar navbar-expand-lg navbar-light bg-light mb-3">
-            <div className="container-fluid">
-              <Link className="navbar-brand" to="/" title="NEAR.fm">
-                <img
-                  src={Logo}
-                  alt="Berry Cards"
-                  className="d-inline-block align-middle"
-                />
-                Berry
+          <HStack pb="4"  w="100%" justify="space-between" spacing="4">
+            <HStack color="brand.100" rounded="xl" background="white" p="2">
+              <Link aria-current="page" to="/recent">
+                Recent
               </Link>
-              <button
-                className="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent"
-                aria-expanded="false"
-                aria-label="Toggle navigation"
-              >
-                <span className="navbar-toggler-icon"></span>
-              </button>
-              <div
-                className="collapse navbar-collapse"
-                id="navbarSupportedContent"
-              >
-                <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                  <li className="nav-item">
-                    <Link className="nav-link" aria-current="page" to="/">
-                      Club
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link className="nav-link" aria-current="page" to="/farm">
-                      Farm
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link className="nav-link" aria-current="page" to="/cards">
-                      Cards
-                    </Link>
-                  </li>
-                  <a
-                    className="btn btn-outline-none"
-                    href="https://app.ref.finance/#wrap.near|farm.berryclub.ek.near"
-                  >
-                    REF Finance
-                  </a>
-                  <li className="nav-item">
-                    <Link className="nav-link" aria-current="page" to="/recent">
-                      Recent
-                    </Link>
-                  </li>
-                  {this.state.signedIn && (
-                    <li className="nav-item">
-                      <Link className="nav-link" aria-current="page" to="/top">
-                        Top
-                      </Link>
-                    </li>
-                  )}
-                  {this.state.signedIn && (
-                    <li className="nav-item">
-                      <Link
-                        className="nav-link"
-                        aria-current="page"
-                        to={`/a/${this.state.signedAccountId}`}
-                      >
-                        Profile
-                      </Link>
-                    </li>
-                  )}
-                  <li className="nav-item">
-                    <Link className="nav-link" aria-current="page" to="/stats">
-                      Stats
-                    </Link>
-                  </li>
-                </ul>
-                <form className="d-flex">{header}</form>
-              </div>
-            </div>
-          </nav>
+              {this.state.signedIn && (
+                <Link aria-current="page" to="/top">
+                  Top
+                </Link>
+              )}
+              {this.state.signedIn && (
+                <Link
+                  aria-current="page"
+                  to={`/a/${this.state.signedAccountId}`}
+                >
+                  Profile
+                </Link>
+              )}
+              <Link aria-current="page" to="/stats">
+                Stats
+              </Link>
+            </HStack>
+
+            <form className="d-flex">{header}</form>
+          </HStack>
 
           <Switch>
             <Route exact path={"/"}>
-              <ClubPage {...passProps} />
-            </Route>
-            <Route exact path={"/farm"}>
-              <FarmPage {...passProps} />
-            </Route>
-            <Route exact path={"/cards"}>
               {this.state.signedIn ? (
                 <HomePage {...passProps} />
               ) : (
@@ -384,4 +325,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default CardsPage;

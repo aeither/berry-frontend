@@ -5,6 +5,7 @@ import "@openfonts/cherry-bomb_all";
 const PRIMARY = "#FF4263";
 const SECONDARY = "#822B38";
 const TERTIARY = "#3D0E19";
+const LIGHTROSE = "#ffc9c9";
 const WHITE = "#FFFFFF";
 
 const fonts = {
@@ -12,15 +13,26 @@ const fonts = {
   body: "Cherry Bomb",
 };
 
-const colors = {};
+const colors = {
+  brand: {
+    100: PRIMARY,
+    500: SECONDARY,
+    900: TERTIARY,
+  },
+};
 
 const styles = {
   global: (props) => ({
     body: {
       fontFamily: "body",
       color: WHITE,
-      bg: PRIMARY,
+      bg: LIGHTROSE,
       lineHeight: "base",
+    },
+    a: {
+      _hover: {
+        color: SECONDARY,
+      },
     },
   }),
 };

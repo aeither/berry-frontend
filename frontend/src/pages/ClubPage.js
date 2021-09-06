@@ -3,9 +3,12 @@ import React from "react";
 import BN from "bn.js";
 import * as nearAPI from "near-api-js";
 import { AlphaPicker, HuePicker, GithubPicker } from "react-color";
-import Switch from "react-switch";
+import ReactSwitch from "react-switch";
 import { Weapons } from "../components/Weapons";
 import Timer from "react-compound-timer";
+import { HashRouter as Router, Link, Route, Switch } from "react-router-dom";
+import { Button, Grid, GridItem, Box, Center } from "@chakra-ui/react";
+import { Heading, HStack, Text, VStack } from "@chakra-ui/layout";
 
 const PixelPrice = new BN("10000000000000000000000");
 const IsMainnet = window.location.hostname === "berryclub.io";
@@ -127,7 +130,7 @@ const decodeLine = (line) => {
 
 const WeaponsCheat = "idkfa";
 
-class App extends React.Component {
+class ClubPage extends React.Component {
   constructor(props) {
     super(props);
 
@@ -1099,6 +1102,33 @@ class App extends React.Component {
       </div>
     );
 
+    const firstRow = !this.state.connected ? (
+      <div>
+        Connecting...{" "}
+        <span
+          className="spinner-grow spinner-grow-sm"
+          role="status"
+          aria-hidden="true"
+        />
+      </div>
+    ) : this.state.signedIn ? (
+      <HStack w="100%" justify="space-between" pb="2">
+        {freeDrawing}
+        <Button
+          variant="outline"
+          rounded="xl"
+          border="2px"
+          borderColor="brand.900"
+          color="brand.900"
+          _hover={{ filter: "brightness(0.5)" }}
+          onClick={() => this.logOut()}
+        >
+          Log out ({this.state.accountId})
+        </Button>
+      </HStack>
+    ) : (
+      <div style={{ marginBottom: "10px" }}>{freeDrawing}</div>
+    );
     const content = !this.state.connected ? (
       <div>
         Connecting...{" "}
@@ -1109,27 +1139,71 @@ class App extends React.Component {
         />
       </div>
     ) : this.state.signedIn ? (
-      <div>
-        <div className={`float-right${watchClass}`}>
-          <button
-            className="btn btn-outline-secondary"
-            onClick={() => this.logOut()}
+      <VStack align="start">
+        <Heading color="brand.100" size="md">
+          Buy Avocados
+        </Heading>
+
+        <HStack spacing="2">
+          <Button
+            variant="solid"
+            rounded="xl"
+            fontSize="sm"
+            background="brand.900"
+            _hover={{ filter: "brightness(0.8)" }}
+            onClick={() => this.buyTokens(10)}
           >
-            Log out ({this.state.accountId})
-          </button>
-        </div>
-        {freeDrawing}
-        <div className={`your-balance${watchClass}`}>
-          Balance:{" "}
+            Buy 25 {Avocado} for Ⓝ0.1
+          </Button>
+          <Button
+            variant="solid"
+            rounded="xl"
+            fontSize="sm"
+            background="brand.900"
+            _hover={{ filter: "brightness(0.8)" }}
+            onClick={() => this.buyTokens(40)}
+          >
+            Buy 100 {Avocado} for Ⓝ0.4
+          </Button>
+        </HStack>
+        <HStack spacing="2">
+          <Button
+            variant="solid"
+            rounded="xl"
+            fontSize="sm"
+            background="brand.900"
+            _hover={{ filter: "brightness(0.8)" }}
+            onClick={() => this.buyTokens(100)}
+          >
+            Buy 250 {Avocado} for Ⓝ1
+          </Button>
+          <Button
+            variant="solid"
+            rounded="xl"
+            fontSize="sm"
+            bgGradient="linear(to-r, #FF0080, brand.100)"
+            _hover={{ filter: "brightness(0.8)" }}
+            onClick={() => this.buyTokens(500)}
+          >
+            DEAL: Buy 1500 {Avocado} for Ⓝ5
+          </Button>
+        </HStack>
+
+        <VStack color="brand.900" align="start">
+          <Heading fontWeight="300" size="lg" color="brand.100">
+            Your Balances{" "}
+          </Heading>
           <Balance
             account={this.state.account}
             pendingPixels={this.state.pendingPixels}
             isFreeDrawing={isFreeDrawing}
             detailed={true}
           />
-          <div>
-            Farming preference:
-            <Switch
+          <HStack spacing="2">
+            <Heading fontWeight="300" size="md">
+              Farming preference:
+            </Heading>
+            <ReactSwitch
               onChange={(e) => this.switchBerry(e)}
               checked={this.state.farmingBanana}
               className="react-switch"
@@ -1142,38 +1216,8 @@ class App extends React.Component {
               }
               checkedIcon={<div className="switch-berry banana">{Banana}</div>}
             />
-          </div>
-        </div>
-        <div className={`buttons${watchClass}`}>
-          <button
-            className="btn btn-primary"
-            onClick={() => this.buyTokens(10)}
-          >
-            Buy <span className="font-weight-bold">25{Avocado}</span> for{" "}
-            <span className="font-weight-bold">Ⓝ0.1</span>
-          </button>{" "}
-          <button
-            className="btn btn-primary"
-            onClick={() => this.buyTokens(40)}
-          >
-            Buy <span className="font-weight-bold">100{Avocado}</span> for{" "}
-            <span className="font-weight-bold">Ⓝ0.4</span>
-          </button>{" "}
-          <button
-            className="btn btn-primary"
-            onClick={() => this.buyTokens(100)}
-          >
-            Buy <span className="font-weight-bold">250{Avocado}</span> for{" "}
-            <span className="font-weight-bold">Ⓝ1</span>
-          </button>{" "}
-          <button
-            className="btn btn-success"
-            onClick={() => this.buyTokens(500)}
-          >
-            DEAL: Buy <span className="font-weight-bold">1500{Avocado}</span>{" "}
-            for <span className="font-weight-bold">Ⓝ5</span>
-          </button>
-        </div>
+          </HStack>
+        </VStack>
         <div className={`color-picker${watchClass}`}>
           <HuePicker
             color={this.state.pickerColor}
@@ -1215,19 +1259,17 @@ class App extends React.Component {
             onChangeComplete={(c) => this.hueColorChange(c)}
           />
         </div>
-      </div>
+      </VStack>
     ) : (
-      <div style={{ marginBottom: "10px" }}>
-        {freeDrawing}
-        <div>
-          <button
-            className="btn btn-primary"
-            onClick={() => this.requestSignIn()}
-          >
-            Log in with NEAR Wallet
-          </button>
-        </div>
-      </div>
+      <Button
+        variant="solid"
+        rounded="xl"
+        background="brand.900"
+        _hover={{ filter: "brightness(0.8)" }}
+        onClick={() => this.requestSignIn()}
+      >
+        Log in with NEAR Wallet
+      </Button>
     );
     const weapons = this.state.weaponsOn ? (
       <div>
@@ -1243,55 +1285,61 @@ class App extends React.Component {
     );
     return (
       <div>
-        <div className={`header${watchClass}`}>
-          <h2>
-            {Avocado} Berry Club {Banana}
-          </h2>{" "}
-          <a className="btn btn-outline-none" href="https://farm.berryclub.io">
-            Berry Farm {Cucumber}
-          </a>
-          <a
-            className="btn btn-outline-none"
-            href="https://app.ref.finance/#wrap.near|berryclub.ek.near"
-          >
-            REF Finance {Banana}
-          </a>
-          <a className="btn btn-outline-none" href="https://berry.cards">
-            [BETA] Berry Cards {Pepper}
-          </a>
-          {content}
-        </div>
-        <div className="container">
-          <div className="row">
-            <div>
-              <div>
-                <canvas
-                  ref={this.canvasRef}
-                  width={600}
-                  height={600}
-                  className={
-                    this.state.boardLoaded
-                      ? `pixel-board${
-                          this.state.watchMode ? " watch-mode" : ""
-                        }`
-                      : "pixel-board c-animated-background"
-                  }
-                />
-              </div>
-            </div>
-            <div className={`leaderboard${watchClass}`}>
-              <div>
-                <Leaderboard
-                  owners={this.state.owners}
-                  accounts={this.state.accounts}
-                  setHover={(accountIndex, v) => this.setHover(accountIndex, v)}
-                  selectedOwnerIndex={this.state.selectedOwnerIndex}
-                  highlightedAccountIndex={this.state.highlightedAccountIndex}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+        {firstRow}
+        <Center h="100px" color="brand.100">
+          <Heading size="3xl" alignSelf="center">
+            Unleash your art!
+          </Heading>
+        </Center>
+
+        <Grid
+          templateRows={{
+            sm: "1fr 1fr 1fr",
+            md: "1fr 1fr",
+            lg: "1fr",
+          }}
+          templateColumns={{
+            sm: "1fr",
+            md: "1fr 1fr",
+            lg: "1fr 600px 1fr",
+          }}
+          gap={4}
+          autoFlow="row dense"
+        >
+          <GridItem>
+            <Box rounded="xl" background="white" p="4">
+              {content}
+            </Box>
+          </GridItem>
+          <GridItem>
+            <Box rounded="xl" background="white" p="2">
+              <canvas
+                ref={this.canvasRef}
+                width={600}
+                height={600}
+                className={
+                  this.state.boardLoaded
+                    ? `pixel-board${this.state.watchMode ? " watch-mode" : ""}`
+                    : "pixel-board c-animated-background"
+                }
+              />
+            </Box>
+          </GridItem>
+          <GridItem>
+            <Box rounded="xl" background="white" p="4">
+              <Heading color="brand.100">Leaderboard</Heading>
+
+              <Leaderboard
+                owners={this.state.owners}
+                accounts={this.state.accounts}
+                setHover={(accountIndex, v) => this.setHover(accountIndex, v)}
+                selectedOwnerIndex={this.state.selectedOwnerIndex}
+                highlightedAccountIndex={this.state.highlightedAccountIndex}
+              />
+            </Box>
+          </GridItem>
+        </Grid>
+
         <div className={`padded${watchClass}`}>
           {this.state.signedIn ? (
             <div>
@@ -1313,6 +1361,63 @@ class App extends React.Component {
 }
 
 const Balance = (props) => {
+  const account = props.account;
+  if (!account) {
+    return "";
+  }
+  const fraction = props.detailed ? 3 : 1;
+  const avacadoBalance =
+    account.avocadoBalance -
+    (props.isFreeDrawing ? 0 : props.pendingPixels || 0);
+  const avocadoFarm =
+    account.avocadoPixels > 0 ? (
+      <span>
+        {"(+"}
+        <span className="font-weight-bold">{account.avocadoPixels}</span>
+        {Avocado}
+        {"/day)"}
+      </span>
+    ) : (
+      ""
+    );
+  const bananaFarm =
+    account.bananaPixels > 0 ? (
+      <span>
+        {"(+"}
+        <span className="font-weight-bold">{account.bananaPixels}</span>
+        {Banana}
+        {"/day)"}
+      </span>
+    ) : (
+      ""
+    );
+  return (
+    <Box>
+      <Text>
+        Avocados{" "}
+        <span className="font-weight-bold">
+          {avacadoBalance.toFixed(fraction)}
+        </span>
+        {Avocado}{" "}
+      </Text>
+      <Text>
+        Bananas{" "}
+        <span className="font-weight-bold">
+          {account.bananaBalance.toFixed(fraction)}
+        </span>
+        {Banana} {avocadoFarm}
+        {bananaFarm}
+        {props.pendingPixels ? (
+          <span> ({props.pendingPixels} pending)</span>
+        ) : (
+          ""
+        )}
+      </Text>
+    </Box>
+  );
+};
+
+const LeaderboardBalance = (props) => {
   const account = props.account;
   if (!account) {
     return "";
@@ -1389,12 +1494,14 @@ const Owner = (props) => {
       onMouseLeave={() => props.setHover(false)}
       className={props.isSelected ? "selected" : ""}
     >
-      <td>{account ? <Account accountId={account.accountId} /> : "..."}</td>
-      <td className="text-nowrap">
-        <small>
-          <Balance account={account} />
-        </small>
-      </td>
+      <HStack justify="space-between">
+        <td>{account ? <Account accountId={account.accountId} /> : "..."}</td>
+        <td className="text-nowrap">
+          <small>
+            <LeaderboardBalance account={account} />
+          </small>
+        </td>
+      </HStack>
     </tr>
   );
 };
@@ -1406,10 +1513,12 @@ const Account = (props) => {
       ? accountId.slice(0, 6) + "..." + accountId.slice(-6)
       : accountId;
   return (
-    <a className="account" href={`https://wayback.berryclub.io/${accountId}`}>
-      {shortAccountId}
-    </a>
+    <Text color="brand.900">
+      <a className="account" href={`https://wayback.berryclub.io/${accountId}`}>
+        {shortAccountId}
+      </a>
+    </Text>
   );
 };
 
-export default App;
+export default ClubPage;

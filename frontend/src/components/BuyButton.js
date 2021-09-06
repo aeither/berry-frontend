@@ -1,15 +1,20 @@
-import React from 'react';
-import {multiplier} from "./common";
+import React from "react";
+import { multiplier } from "./common";
 import Big from "big.js";
+import { Button, Text, List, ListItem } from "@chakra-ui/react";
 
 const fromNear = (s) => parseFloat(s) / 1e24;
 
 function BuyButton(props) {
-  const price = fromNear(props.price / multiplier() * 1.0001);
+  const price = fromNear((props.price / multiplier()) * 1.0001);
 
   async function buyCard(e) {
     e.preventDefault();
-    await props._near.contract.buy_card({card_id: props.cardId}, "200000000000000", Big(props.price / multiplier() * 1.0001).toFixed(0));
+    await props._near.contract.buy_card(
+      { card_id: props.cardId },
+      "200000000000000",
+      Big((props.price / multiplier()) * 1.0001).toFixed(0)
+    );
   }
 
   const appCommission = price / 100;
@@ -23,28 +28,34 @@ function BuyButton(props) {
   const newPrice = price * 1.2;
 
   return (
-    <div>
-      <button
-        className="btn btn-success"
-        disabled={!props.signedIn}
+    <>
+      <Button
+        color="white"
+        variant="solid"
+        rounded="xl"
+        fontSize="sm"
+        bgGradient="linear(to-r, #FF0080, brand.100)"
+        _hover={{ filter: "brightness(0.8)" }}
         onClick={(e) => buyCard(e)}
       >
         Buy for {price.toFixed(2)} NEAR
-      </button>
-      <div className="text-muted text-start">
+      </Button>
+      <Text color="gray.600">
         Price breakdown:
-        <ul>
+        <List>
           {props.ownerId && (
-            <li>Owner @{props.ownerId} will get {ownerPrice.toFixed(2)} NEAR</li>
+            <ListItem>
+              Owner @{props.ownerId} will get {ownerPrice.toFixed(2)} NEAR
+            </ListItem>
           )}
-          <li>Art DAO will get {artDaoProfit.toFixed(2)} NEAR</li>
-          <li>1% App commission is {appCommission.toFixed(2)} NEAR</li>
-        </ul>
-        <p>
-          The new price will be {newPrice.toFixed(2)} NEAR
-        </p>
-      </div>
-    </div>
+          <ListItem>Art DAO will get {artDaoProfit.toFixed(2)} NEAR</ListItem>
+          <ListItem>
+            1% App commission is {appCommission.toFixed(2)} NEAR
+          </ListItem>
+        </List>
+        <p>The new price will be {newPrice.toFixed(2)} NEAR</p>
+      </Text>
+    </>
   );
 }
 

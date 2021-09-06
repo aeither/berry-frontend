@@ -1,5 +1,6 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {fromNear} from "../components/BuyButton";
+import { ListItem, List, VStack, Box, Heading } from "@chakra-ui/layout";
+import React, { useCallback, useEffect, useState } from "react";
+import { fromNear } from "../components/BuyButton";
 
 function StatsPage(props) {
   const [stats, setStats] = useState(null);
@@ -21,16 +22,16 @@ function StatsPage(props) {
       artDaoId: t.art_dao_id,
       totalVotes: t.total_votes,
     };
-  }, [props._near])
+  }, [props._near]);
 
   useEffect(() => {
     if (props.connected) {
       fetchStats().then((stats) => {
         setStats(stats);
         setLoading(false);
-      })
+      });
     }
-  }, [props.connected, fetchStats])
+  }, [props.connected, fetchStats]);
 
   return (
     <div className="container">
@@ -44,19 +45,38 @@ function StatsPage(props) {
             </div>
           </div>
         ) : (
-          <div className="col col-12 col-lg-6 col-xl-6">
-            <h3>Global Stats</h3>
-            <ul>
-              <li>Num accounts: {stats.numAccounts}</li>
-              <li>Total votes: {stats.totalVotes}</li>
-              <li>Total purchases: {stats.numPurchases}</li>
-              <li>Total unique purchases: {stats.numUniqueCardsBought}</li>
-              <li>Total volume: {stats.nearVolume.toFixed(2)} NEAR</li>
-              <li>Total Art DAO profit: {stats.artDaoProfit.toFixed(2)} NEAR</li>
-              <li>Art DAO account ID: <a href={`https://explorer.near.org/accounts/${stats.artDaoId}`}>@{stats.artDaoId}</a></li>
-              <li>Total App commission: {stats.appCommission.toFixed(2)} NEAR</li>
-            </ul>
-          </div>
+          <Box rounded="xl" background="white" p="4" w="auto">
+            <VStack color="brand.900" align="start">
+              <Heading fontWeight="300" size="lg" color="brand.100">
+                Stats{" "}
+              </Heading>
+              <List spacing={3}>
+                <ListItem>Num accounts: {stats.numAccounts}</ListItem>
+                <ListItem>Total votes: {stats.totalVotes}</ListItem>
+                <ListItem>Total purchases: {stats.numPurchases}</ListItem>
+                <ListItem>
+                  Total unique purchases: {stats.numUniqueCardsBought}
+                </ListItem>
+                <ListItem>
+                  Total volume: {stats.nearVolume.toFixed(2)} NEAR
+                </ListItem>
+                <ListItem>
+                  Total Art DAO profit: {stats.artDaoProfit.toFixed(2)} NEAR
+                </ListItem>
+                <ListItem>
+                  Art DAO account ID:{" "}
+                  <a
+                    href={`https://explorer.near.org/accounts/${stats.artDaoId}`}
+                  >
+                    @{stats.artDaoId}
+                  </a>
+                </ListItem>
+                <ListItem>
+                  Total App commission: {stats.appCommission.toFixed(2)} NEAR
+                </ListItem>
+              </List>
+            </VStack>
+          </Box>
         )}
       </div>
     </div>

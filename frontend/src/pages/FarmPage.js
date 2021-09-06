@@ -1,38 +1,69 @@
 // import "./FarmPage.scss";
-import React from 'react';
-import BN from 'bn.js';
-import * as nearAPI from 'near-api-js'
-import InputNumber from 'react-input-number';
-import Timer from 'react-compound-timer';
-
-const IsMainnet = true;
+import React from "react";
+import BN from "bn.js";
+import * as nearAPI from "near-api-js";
+import InputNumber from "react-input-number";
+import Timer from "react-compound-timer";
+import {
+  Button,
+  HStack,
+  Center,
+  Heading,
+  Box,
+  VStack,
+  Text,
+  Grid,
+  GridItem,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+} from "@chakra-ui/react";
+const IsMainnet = window.location.hostname === "berry.cards";
 const TestNearConfig = {
-  networkId: 'testnet',
-  nodeUrl: 'https://rpc.testnet.near.org',
-  bananaContractName: 'berryclub.testnet',
-  contractName: 'farm.berryclub.testnet',
-  walletUrl: 'https://wallet.testnet.near.org',
+  networkId: "testnet",
+  nodeUrl: "https://rpc.testnet.near.org",
+  bananaContractName: "berryclub.testnet",
+  contractName: "farm.berryclub.testnet",
+  walletUrl: "https://wallet.testnet.near.org",
 };
 const MainNearConfig = {
-  networkId: 'mainnet',
-  nodeUrl: 'https://rpc.mainnet.near.org',
-  bananaContractName: 'berryclub.ek.near',
-  contractName: 'farm.berryclub.ek.near',
-  walletUrl: 'https://wallet.near.org',
+  networkId: "mainnet",
+  nodeUrl: "https://rpc.mainnet.near.org",
+  bananaContractName: "berryclub.ek.near",
+  contractName: "farm.berryclub.ek.near",
+  walletUrl: "https://wallet.near.org",
 };
 const NearConfig = IsMainnet ? MainNearConfig : TestNearConfig;
 
-const Avocado = <span role="img" aria-label="avocado" className="berry">🥑</span>;
-const Banana = <span role="img" aria-label="banana" className="berry">🍌</span>;
-const Cucumber = <span role="img" aria-label="cucumber" className="berry">🥒</span>;
-const Near = <span role="img" aria-label="near" className="berry">Ⓝ</span>;
+const Avocado = (
+  <span role="img" aria-label="avocado" className="berry">
+    🥑
+  </span>
+);
+const Banana = (
+  <span role="img" aria-label="banana" className="berry">
+    🍌
+  </span>
+);
+const Cucumber = (
+  <span role="img" aria-label="cucumber" className="berry">
+    🥒
+  </span>
+);
+const Near = (
+  <span role="img" aria-label="near" className="berry">
+    Ⓝ
+  </span>
+);
 
 const Berry = {
-  Avocado: 'Avocado',
-  Banana: 'Banana',
+  Avocado: "Avocado",
+  Banana: "Banana",
 };
 
-class App extends React.Component {
+class FarmPage extends React.Component {
   constructor(props) {
     super(props);
 
@@ -55,9 +86,7 @@ class App extends React.Component {
     });
   }
 
-  componentDidMount() {
-
-  }
+  componentDidMount() {}
 
   parseBananaAccount(account, accountId) {
     if (!account) {
@@ -69,7 +98,7 @@ class App extends React.Component {
         bananaBalanceBN: new BN(0),
         numPixels: 0,
         farmingPreference: Berry.Avocado,
-      }
+      };
     } else {
       account = {
         accountId: account.account_id,
@@ -79,23 +108,29 @@ class App extends React.Component {
         bananaBalanceBN: new BN(account.banana_balance),
         numPixels: account.num_pixels,
         farmingPreference: account.farming_preference,
-      }
+      };
     }
     account.startTime = new Date().getTime();
-    account.avocadoPixels = (account.farmingPreference === Berry.Avocado) ? (account.numPixels + 1) : 0;
-    account.bananaPixels = (account.farmingPreference === Berry.Banana) ? (account.numPixels) : 0;
+    account.avocadoPixels =
+      account.farmingPreference === Berry.Avocado ? account.numPixels + 1 : 0;
+    account.bananaPixels =
+      account.farmingPreference === Berry.Banana ? account.numPixels : 0;
     account.avocadoRewardPerMs = account.avocadoPixels / (24 * 60 * 60 * 1000);
     account.bananaRewardPerMs = account.bananaPixels / (24 * 60 * 60 * 1000);
-    account.bananaRewardPerMsBN = account.bananaBalanceBN.div(new BN(24 * 60 * 60 * 1000));
+    account.bananaRewardPerMsBN = account.bananaBalanceBN.div(
+      new BN(24 * 60 * 60 * 1000)
+    );
     return account;
   }
 
   async getAccount(accountId, stats) {
     const account = this.parseBananaAccount(
-      await this._bananaContract.get_account({account_id: accountId}),
+      await this._bananaContract.get_account({ account_id: accountId }),
       accountId
     );
-    let cucumberAccount = await this._contract.get_account({account_id: accountId});
+    let cucumberAccount = await this._contract.get_account({
+      account_id: accountId,
+    });
     if (!cucumberAccount) {
       Object.assign(account, {
         nearBalanceBn: new BN(0),
@@ -106,14 +141,17 @@ class App extends React.Component {
       Object.assign(account, {
         nearBalanceBn: new BN(cucumberAccount.near_balance),
         cucumberBalanceBn: new BN(cucumberAccount.cucumber_balance),
-        nearClaimed: parseFloat(cucumberAccount.near_claimed) / Math.pow(10, 24),
+        nearClaimed:
+          parseFloat(cucumberAccount.near_claimed) / Math.pow(10, 24),
       });
     }
     await this._account.fetchState();
-    account.accountNearBalance = parseFloat(this._account._state.amount) / 1e24;
-    account.nearBalance = parseFloat(account.nearBalanceBn.toString()) / Math.pow(10, 24);
-    account.cucumberBalance = parseFloat(account.cucumberBalanceBn.toString()) / this._pixelCost;
-    account.percent = account.cucumberBalance * 100 / stats.totalSupply;
+    // account.accountNearBalance = parseFloat(this._account._state.amount) / 1e24;
+    account.nearBalance =
+      parseFloat(account.nearBalanceBn.toString()) / Math.pow(10, 24);
+    account.cucumberBalance =
+      parseFloat(account.cucumberBalanceBn.toString()) / this._pixelCost;
+    account.percent = (account.cucumberBalance * 100) / stats.totalSupply;
     return account;
   }
 
@@ -123,22 +161,28 @@ class App extends React.Component {
     }
 
     let currentTime = new Date().getTime();
-    const nextReward = parseFloat(await this._bananaContract.get_next_reward_timestamp()) / 1e6;
-    const lastReward = parseFloat(await this._bananaContract.get_last_reward_timestamp()) / 1e6;
-    const expectedReward = parseFloat(await this._bananaContract.get_expected_reward()) / 1e24;
+    const nextReward =
+      parseFloat(await this._bananaContract.get_next_reward_timestamp()) / 1e6;
+    const lastReward =
+      parseFloat(await this._bananaContract.get_last_reward_timestamp()) / 1e6;
+    const expectedReward =
+      parseFloat(await this._bananaContract.get_expected_reward()) / 1e24;
     const rawStats = await this._contract.get_stats();
     const stats = {
       totalSupplyBn: new BN(rawStats.total_cucumber_balance),
-      totalSupply: parseFloat(rawStats.total_cucumber_balance) / this._pixelCost,
-      totalNearClaimed: parseFloat(rawStats.total_near_claimed) / Math.pow(10, 24),
-      totalNearRewarded: parseFloat(rawStats.total_near_received) / Math.pow(10, 24),
+      totalSupply:
+        parseFloat(rawStats.total_cucumber_balance) / this._pixelCost,
+      totalNearClaimed:
+        parseFloat(rawStats.total_near_claimed) / Math.pow(10, 24),
+      totalNearRewarded:
+        parseFloat(rawStats.total_near_received) / Math.pow(10, 24),
       timeToNextRewards: nextReward - currentTime,
       timeFromLastRewards: currentTime - lastReward,
       expectedReward,
     };
     this.setState({
       stats,
-    })
+    });
   }
 
   async refreshAccountStats() {
@@ -158,7 +202,8 @@ class App extends React.Component {
       const t = new Date().getTime() - account.startTime;
       this.setState({
         account: Object.assign({}, account, {
-          avocadoBalance: account.avocadoBalance + t * account.avocadoRewardPerMs,
+          avocadoBalance:
+            account.avocadoBalance + t * account.avocadoRewardPerMs,
           bananaBalance: account.bananaBalance + t * account.bananaRewardPerMs,
         }),
       });
@@ -167,33 +212,67 @@ class App extends React.Component {
 
   async _initNear() {
     const keyStore = new nearAPI.keyStores.BrowserLocalStorageKeyStore();
-    const near = await nearAPI.connect(Object.assign({ deps: { keyStore } }, NearConfig));
+    const near = await nearAPI.connect(
+      Object.assign({ deps: { keyStore } }, NearConfig)
+    );
     this._keyStore = keyStore;
     this._near = near;
 
-    this._walletConnection = new nearAPI.WalletConnection(near, NearConfig.contractName);
+    this._walletConnection = new nearAPI.WalletConnection(
+      near,
+      NearConfig.contractName
+    );
     this._accountId = this._walletConnection.getAccountId();
 
     this._account = this._walletConnection.account();
-    this._bananaContract = new nearAPI.Contract(this._account, NearConfig.bananaContractName, {
-      viewMethods: ['get_account', 'get_expected_reward', 'get_next_reward_timestamp', 'get_last_reward_timestamp', 'get_account_by_index', 'get_lines', 'get_line_versions', 'get_pixel_cost', 'get_account_balance', 'get_account_num_pixels', 'get_account_id_by_index'],
-      changeMethods: ['transfer_with_vault', 'ft_transfer_call'],
-    });
-    this._contract = new nearAPI.Contract(this._account, NearConfig.contractName, {
-      viewMethods: ['account_exists', 'get_account', 'get_stats', 'get_near_balance', 'get_total_near_claimed', 'get_total_near_received', 'get_balance', 'get_total_supply'],
-      changeMethods: ['claim_near', 'transfer_raw'],
-    });
+    this._bananaContract = new nearAPI.Contract(
+      this._account,
+      NearConfig.bananaContractName,
+      {
+        viewMethods: [
+          "get_account",
+          "get_expected_reward",
+          "get_next_reward_timestamp",
+          "get_last_reward_timestamp",
+          "get_account_by_index",
+          "get_lines",
+          "get_line_versions",
+          "get_pixel_cost",
+          "get_account_balance",
+          "get_account_num_pixels",
+          "get_account_id_by_index",
+        ],
+        changeMethods: ["transfer_with_vault", "ft_transfer_call"],
+      }
+    );
+    this._contract = new nearAPI.Contract(
+      this._account,
+      NearConfig.contractName,
+      {
+        viewMethods: [
+          "account_exists",
+          "get_account",
+          "get_stats",
+          "get_near_balance",
+          "get_total_near_claimed",
+          "get_total_near_received",
+          "get_balance",
+          "get_total_supply",
+        ],
+        changeMethods: ["claim_near", "transfer_raw"],
+      }
+    );
     this._pixelCostBN = new BN(await this._bananaContract.get_pixel_cost());
     this._pixelCost = parseFloat(this._pixelCostBN.toString());
     await this.refresh();
   }
 
   async requestSignIn() {
-    const appTitle = 'Berry Farm';
+    const appTitle = "Berry Farm";
     await this._walletConnection.requestSignIn(
-        NearConfig.contractName,
-        appTitle
-    )
+      NearConfig.contractName,
+      appTitle
+    );
   }
 
   async logOut() {
@@ -202,32 +281,38 @@ class App extends React.Component {
     this.setState({
       signedIn: !!this._accountId,
       accountId: this._accountId,
-    })
+    });
   }
 
   async stakeBananas(bananas) {
     await this.refreshAccountStats();
     if (bananas) {
-      bananas = new BN(Math.trunc(bananas * 100000)).mul(this._pixelCostBN).div(new BN(100000));
+      bananas = new BN(Math.trunc(bananas * 100000))
+        .mul(this._pixelCostBN)
+        .div(new BN(100000));
     } else {
       bananas = this.state.account.bananaBalanceBN;
     }
-    await this._bananaContract.ft_transfer_call({
-      receiver_id: NearConfig.contractName,
-      amount: bananas.toString(),
-      memo: `Swapping ${bananas.toString()} 🍌 to get ${bananas.toString()} 🥒`,
-      msg: '"DepositAndStake"',
-    }, new BN("50000000000000"), new BN("1"))
+    await this._bananaContract.ft_transfer_call(
+      {
+        receiver_id: NearConfig.contractName,
+        amount: bananas.toString(),
+        memo: `Swapping ${bananas.toString()} 🍌 to get ${bananas.toString()} 🥒`,
+        msg: '"DepositAndStake"',
+      },
+      new BN("50000000000000"),
+      new BN("1")
+    );
   }
 
   async claimNear() {
     this.setState({
-      claiming: true
+      claiming: true,
     });
     await this._contract.claim_near();
     await this.refreshAccountStats();
     this.setState({
-      claiming: false
+      claiming: false,
     });
   }
 
@@ -242,228 +327,339 @@ class App extends React.Component {
   render() {
     const account = this.state.account;
     const fraction = 3;
-    const content = !this.state.connected ? (
-        <div>Connecting... <span className="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span></div>
-    ) : (this.state.signedIn ? (
-        <div>
-          <div className="float-right">
-            <button
-              className="btn btn-outline-secondary"
-              onClick={() => this.logOut()}>Log out ({this.state.accountId})</button>
-          </div>
-          <div>
-            { account ? (
-              <div className="lines">
-                <div>
-                  <h3>Your Balances</h3>
-                  <button
-                    className="btn"
-                    onClick={() => this.refreshAccountStats()}
-                  >
-                    Refresh
-                  </button>
-                </div>
-                <div className="balances">
-                  {Avocado}{' '}{account.avocadoBalance.toFixed(fraction)}
-                  {(account.avocadoPixels > 0) ? (
-                    <span>
-                      {' (+'}{account.avocadoPixels}{Avocado}{'/day)'}
-                    </span>
-                  ) : ""}
-                </div>
-                <div className="balances">
-                  {Banana}{' '}{account.bananaBalance.toFixed(fraction)}
-                  {(account.bananaPixels > 0) ? (
-                    <span>
-                      {' (+'}{account.bananaPixels}{Banana}{'/day)'}
-                    </span>
-                  ) : ""}
-                </div>
-                <div>
-                  <div>
-                    <span className="balances label-for-swap">{Banana}</span>
-                    <InputNumber
-                      className="balances swap-input"
-                      min={0.001}
-                      max={this.state.account.bananaBalance}
-                      value={this.state.bananaNum}
-                      onChange={(bananaNum) => this.setState({bananaNum})}
-                      enableMobileNumericKeyboard
-                    />
-                    <button
-                      className={"btn-max balances"}
-                      disabled={account.bananaBalance === 0}
-                      onClick={() => this.setState({bananaNum: ''})}
-                    >
-                      MAX
-                    </button>
-
-                  <Swap
-                    account={this.state.account}
-                    stakeBananas={(b) => this.stakeBananas(b)}
-                    amount={this.state.bananaNum}
-                  />
-                  </div>
-                </div>
-                <div className="balances">
-                  {Cucumber}{' '}{account.cucumberBalance.toFixed(fraction)}{' ('}{account.percent.toFixed(fraction)}{'% share)'}
-                </div>
-                <div className="balances">
-                  {Near}{' '}{account.accountNearBalance.toFixed(fraction)}
-                </div>
-                <div>
-                  <button
-                    className={"btn btn-success" + ((account.nearBalance > 0) ? " btn-large" : " hidden")}
-                    disabled={this.state.claiming}
-                    onClick={() => this.claimNear()}
-                  >
-                    Claim {account.nearBalance.toFixed(fraction)} {Near}
-                  </button>
-                </div>
-              </div>
-            ) : ""}
-            </div>
-        </div>
+    const firstRow = !this.state.connected ? (
+      <div></div>
+    ) : this.state.signedIn ? (
+      <HStack w="100%" justify="end" pb="2">
+        <Button
+          variant="outline"
+          rounded="xl"
+          border="2px"
+          borderColor="brand.900"
+          color="brand.900"
+          _hover={{ filter: "brightness(0.5)" }}
+          onClick={() => this.logOut()}
+        >
+          Log out ({this.state.accountId})
+        </Button>
+      </HStack>
     ) : (
-        <div style={{marginBottom: "10px"}}>
-          <button
-              className="btn btn-primary"
-              onClick={() => this.requestSignIn()}>Log in with NEAR Wallet</button>
+      <div style={{ marginBottom: "10px" }}></div>
+    );
+    const content = !this.state.connected ? (
+      <div>
+        Connecting...{" "}
+        <span
+          className="spinner-grow spinner-grow-sm"
+          role="status"
+          aria-hidden="true"
+        ></span>
+      </div>
+    ) : this.state.signedIn ? (
+      <div>
+        <div>
+          {account ? (
+            <VStack color="brand.900" align="start">
+              <HStack>
+                <Heading fontWeight="300" size="lg" color="brand.100">
+                  Your Balances{" "}
+                </Heading>
+                <Button
+                  color="white"
+                  variant="solid"
+                  rounded="xl"
+                  fontSize="sm"
+                  bgGradient="linear(to-r, #FF0080, brand.100)"
+                  _hover={{ filter: "brightness(0.8)" }}
+                  onClick={() => this.refreshAccountStats()}
+                >
+                  Refresh
+                </Button>
+              </HStack>
+              <Text>
+                Avocados {account.avocadoBalance.toFixed(fraction)} {Avocado}
+                {account.avocadoPixels > 0 ? (
+                  <span>
+                    {" (+"}
+                    {account.avocadoPixels}
+                    {Avocado}
+                    {"/day)"}
+                  </span>
+                ) : (
+                  ""
+                )}
+              </Text>
+              <Text>
+                Bananas {account.bananaBalance.toFixed(fraction)} {Banana}
+                {account.bananaPixels > 0 ? (
+                  <span>
+                    {" (+"}
+                    {account.bananaPixels}
+                    {Banana}
+                    {"/day)"}
+                  </span>
+                ) : (
+                  ""
+                )}
+              </Text>
+              <Box>
+                <Text color="brand.100" py="2">
+                  Swap {Banana} to {Cucumber}{" "}
+                </Text>
+
+                <NumberInput
+                  variant="outline"
+                  background="red.100"
+                  onChange={(bananaNum) => this.setState({ bananaNum })}
+                  value={this.state.bananaNum}
+                  min={0.001}
+                  max={this.state.account.bananaBalance}
+                >
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+                <Button
+                  disabled={account.bananaBalance === 0}
+                  onClick={() => this.setState({ bananaNum: "" })}
+                >
+                  MAX
+                </Button>
+
+                <Swap
+                  account={this.state.account}
+                  stakeBananas={(b) => this.stakeBananas(b)}
+                  amount={this.state.bananaNum}
+                />
+              </Box>
+              <Text>
+                {Cucumber} {account.cucumberBalance.toFixed(fraction)}
+                {" ("}
+                {account.percent.toFixed(fraction)}
+                {"% share)"}
+              </Text>
+              <Button
+                color="white"
+                variant="solid"
+                rounded="xl"
+                fontSize="sm"
+                background="brand.100"
+                _hover={{ filter: "brightness(0.8)" }}
+                disabled={account.nearBalance > 0}
+                disabled={this.state.claiming}
+                onClick={() => this.claimNear()}
+              >
+                Claim {account.nearBalance.toFixed(fraction)} {Near}
+              </Button>
+            </VStack>
+          ) : (
+            ""
+          )}
         </div>
-    ));
+      </div>
+    ) : (
+      <div style={{ marginBottom: "10px" }}>
+        <Button
+          variant="solid"
+          rounded="xl"
+          background="brand.900"
+          _hover={{ filter: "brightness(0.8)" }}
+          onClick={() => this.requestSignIn()}
+        >
+          Log in with NEAR Wallet
+        </Button>
+      </div>
+    );
     const stats = this.state.stats;
     const statsContent = stats ? (
-        <div>
-          <div>
-            <h3>Rewards</h3>
-            <button
-              className="btn"
-              onClick={() => this.refresh()}
-            >
-              Refresh
-            </button>
-          </div>
-          <div className="lines">
+      <VStack color="brand.900" align="start">
+        <HStack>
+          <Heading fontWeight="300" size="lg" color="brand.100">
+            Rewards{" "}
+          </Heading>
+          <Button
+            color="white"
+            variant="solid"
+            rounded="xl"
+            fontSize="sm"
+            bgGradient="linear(to-r, #FF0080, brand.100)"
+            _hover={{ filter: "brightness(0.8)" }}
+            onClick={() => this.refresh()}
+          >
+            Refresh
+          </Button>
+        </HStack>
+        <div className="lines">
+          <div>Berry Club distributes rewards at most once per minute</div>
+          {account ? (
             <div>
-              Berry Club distributes rewards at most once per minute
-            </div>
-            {account ? (
               <div>
-                <div>
-                  <span className="label">Your next reward {Near}</span>
-                  <span className="balances">{(stats.expectedReward * account.percent / 100).toFixed(6)}</span>
-                </div>
-                <div>
-                  <span className="label">Total earned {Near}</span>
-                  <span className="balances">
-                    {(account.nearClaimed + account.nearBalance).toFixed(6)}
-                  </span>
-                </div>
+                <span className="label">Your next reward {Near}</span>
+                <span className="balances">
+                  {((stats.expectedReward * account.percent) / 100).toFixed(6)}
+                </span>
               </div>
-              ): ""}
-            <div>
-              <span className="label">{(stats.timeToNextRewards > 0) ? "Time until next reward" : "Time from last reward"}</span>
-              <span className={"balances" + ((stats.timeToNextRewards < 0) ? " red" : "")}>
-                <Timer
-                  key={stats.timeToNextRewards}
-                  initialTime={(stats.timeToNextRewards > 0) ? stats.timeToNextRewards : stats.timeFromLastRewards}
-                  direction={(stats.timeToNextRewards > 0) ? "backward" : "forward"}
-                  timeToUpdate={100}
-                  lastUnit="h"
-                  checkpoints={[
-                    {
-                      time: 0,
-                      callback: () => this.refreshStats(),
-                    },
-                  ]}
-                >
-                  {() => (
-                    <React.Fragment>
-                      <Timer.Hours />:
-                      <Timer.Minutes formatValue={v => `${v}`.padStart(2, '0')}/>:
-                      <Timer.Seconds formatValue={v => `${v}`.padStart(2, '0')} />.
-                      <Timer.Milliseconds formatValue={v => `${v}`.padStart(3, '0')} />
-                    </React.Fragment>
-                  )}
-                </Timer>
-              </span>
+              <div>
+                <span className="label">Total earned {Near}</span>
+                <span className="balances">
+                  {(account.nearClaimed + account.nearBalance).toFixed(6)}
+                </span>
+              </div>
             </div>
-            {(stats.timeToNextRewards < 0) ? (
-              <div className="larger font-weight-bold">
-                Use {Avocado} to draw a pixel on berry club to distribute {Near} rewards.
-              </div>
-            ) : ""}
+          ) : (
+            ""
+          )}
+          <div>
+            <span className="label">
+              {stats.timeToNextRewards > 0
+                ? "Time until next reward"
+                : "Time from last reward"}
+            </span>
+            <span
+              className={
+                "balances" + (stats.timeToNextRewards < 0 ? " red" : "")
+              }
+            >
+              <Timer
+                key={stats.timeToNextRewards}
+                initialTime={
+                  stats.timeToNextRewards > 0
+                    ? stats.timeToNextRewards
+                    : stats.timeFromLastRewards
+                }
+                direction={stats.timeToNextRewards > 0 ? "backward" : "forward"}
+                timeToUpdate={100}
+                lastUnit="h"
+                checkpoints={[
+                  {
+                    time: 0,
+                    callback: () => this.refreshStats(),
+                  },
+                ]}
+              >
+                {() => (
+                  <React.Fragment>
+                    <Timer.Hours />:
+                    <Timer.Minutes
+                      formatValue={(v) => `${v}`.padStart(2, "0")}
+                    />
+                    :
+                    <Timer.Seconds
+                      formatValue={(v) => `${v}`.padStart(2, "0")}
+                    />
+                    .
+                    <Timer.Milliseconds
+                      formatValue={(v) => `${v}`.padStart(3, "0")}
+                    />
+                  </React.Fragment>
+                )}
+              </Timer>
+            </span>
+          </div>
+          {stats.timeToNextRewards < 0 ? (
+            <div className="larger font-weight-bold">
+              Use {Avocado} to draw a pixel on berry club to distribute {Near}{" "}
+              rewards.
+            </div>
+          ) : (
+            ""
+          )}
+        </div>
+        <HStack>
+          <Heading fontWeight="300" size="lg" color="brand.100">
+            Global stats
+          </Heading>
+          <Button
+            color="white"
+            variant="solid"
+            rounded="xl"
+            fontSize="sm"
+            bgGradient="linear(to-r, #FF0080, brand.100)"
+            _hover={{ filter: "brightness(0.8)" }}
+            onClick={() => this.refresh()}
+          >
+            Refresh
+          </Button>
+        </HStack>
+        <div className="lines">
+          <div>
+            <span className="label">Next reward {Near}</span>
+            <span className="balances">{stats.expectedReward.toFixed(6)}</span>
           </div>
           <div>
-            <h3>Global stats</h3>
-            <button
-              className="btn"
-              onClick={() => this.refresh()}
-            >
-              Refresh
-            </button>
+            <span className="label">Total {Cucumber} Supplied</span>
+            <span className="balances">{stats.totalSupply.toFixed(3)}</span>
           </div>
-          <div className="lines">
-            <div>
-              <span className="label">Next reward {Near}</span>
-              <span className="balances">{stats.expectedReward.toFixed(6)}</span>
-            </div>
-            <div>
-              <span className="label">Total {Cucumber} Supplied</span>
-              <span className="balances">{stats.totalSupply.toFixed(3)}</span>
-            </div>
-            <div>
-              <span className="label">Total {Near} Rewarded</span>
-              <span className="balances">{stats.totalNearRewarded.toFixed(6)}</span>
-            </div>
-            <div>
-              <span className="label">Total {Near} Claimed</span>
-              <span className="balances">{stats.totalNearClaimed.toFixed(6)}</span>
-            </div>
-
+          <div>
+            <span className="label">Total {Near} Rewarded</span>
+            <span className="balances">
+              {stats.totalNearRewarded.toFixed(6)}
+            </span>
+          </div>
+          <div>
+            <span className="label">Total {Near} Claimed</span>
+            <span className="balances">
+              {stats.totalNearClaimed.toFixed(6)}
+            </span>
           </div>
         </div>
-      ) : "";
+      </VStack>
+    ) : (
+      ""
+    );
     return (
-        <div className="container">
-          <div className="row">
-            <div>
-              <div>
-              <h2>Berry Farm {Cucumber}</h2>
-              <a
-                className="btn btn-outline-none"
-                href="https://berryclub.io">{Avocado} Berry Club {Banana}
-              </a>
-              <a
-                className="btn btn-outline-none"
-                href="https://app.ref.finance/#wrap.near|farm.berryclub.ek.near">REF Finance {Cucumber}
-              </a>
-              </div>
-              <div className="call-to-action">
-                Swap {Banana} to stake {Cucumber} to farm {Near}
-              </div>
+      <div>
+        {firstRow}
+        <Center h="100px" color="brand.100">
+          <Heading size="3xl" alignSelf="center">
+            Swap {Banana} to stake {Cucumber} to farm {Near}
+          </Heading>
+        </Center>
+
+        <Grid
+          templateRows={{
+            sm: "1fr 1fr",
+            md: "1fr",
+            lg: "1fr",
+          }}
+          templateColumns={{
+            sm: "1fr",
+            md: "1fr 1fr",
+            lg: "1fr 1fr",
+          }}
+          gap={4}
+          autoFlow="row dense"
+        >
+          <GridItem>
+            <Box rounded="xl" background="white" p="4">
               {content}
+            </Box>
+          </GridItem>
+          <GridItem>
+            <Box rounded="xl" background="white" p="4">
               {statsContent}
-              <div>
-              </div>
-            </div>
-          </div>
-        </div>
+            </Box>
+          </GridItem>
+        </Grid>
+      </div>
     );
   }
 }
 
 const Swap = (props) => {
   return (
-    <button
-      className={"btn btn-large" + (props.amount === 0 ? " btn-success" : "")}
+    <Button
       disabled={props.account.bananaBalance < props.amount}
       onClick={() => props.stakeBananas(props.amount)}
     >
-      Swap <span className="font-weight-bold">{props.amount || "ALL"}{Banana}</span> to <span className="font-weight-bold">{Cucumber}</span>
-    </button>
+      Swap {props.amount || "ALL"}
+      {Banana}
+      to <span className="font-weight-bold">{Cucumber}</span>
+    </Button>
   );
-}
+};
 
 /*
 const Account = (props) => {
@@ -475,4 +671,4 @@ const Account = (props) => {
             href={`https://wayback.berryclub.io/${accountId}`}>{shortAccountId}</a>
 }
 */
-export default App;
+export default FarmPage;

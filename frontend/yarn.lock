@@ -10882,6 +10882,11 @@ react-overlays@^5.0.0:
     uncontrollable "^7.2.1"
     warning "^4.0.3"
 
+react-parallax-tilt@^1.5.57:
+  version "1.5.57"
+  resolved "https://registry.yarnpkg.com/react-parallax-tilt/-/react-parallax-tilt-1.5.57.tgz#575cc26b8237b65874d7d69edb145f40a56e76b3"
+  integrity sha512-Ziz2rbDnJKRyVBZApl9LdQ/Tv7bB6O1ZbvYdR0wbdtQPYcK/7uKfFC4VfUNFZJJs2MFk/XLmolvaMPnyM5KpVA==
+
 react-remove-scroll-bar@^2.1.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/react-remove-scroll-bar/-/react-remove-scroll-bar-2.2.0.tgz#d4d545a7df024f75d67e151499a6ab5ac97c8cdd"

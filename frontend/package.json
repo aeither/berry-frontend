@@ -31,6 +31,7 @@
     "react-infinite-scroller": "^1.2.4",
     "react-input-number": "^5.0.19",
     "react-markdown": "^5.0.3",
+    "react-parallax-tilt": "^1.5.57",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.0",
     "react-switch": "^5.0.1",
